@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 SHORTCUT LOCK · generate & unlock</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #0b1120 0%, #1a2639 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .glass-card {
+            background: rgba(18, 25, 40, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px #02061780;
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+        }
+        h1 {
+            font-weight: 500;
+            color: #e2e8f0;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-left: 6px solid #38bdf8;
+            padding-left: 1rem;
+        }
+        h2 {
+            font-weight: 500;
+            color: #cbd5e1;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .config-panel, .result-panel {
+            transition: opacity 0.2s ease;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* daftar shortcut (konfigurasi) */
+        .shortcut-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .shortcut-row {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 2rem;
+            padding: 0.6rem 1rem 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+        }
+        .shortcut-icon {
+            font-size: 1.4rem;
+            width: 2rem;
+            text-align: center;
+            color: #94a3b8;
+        }
+        .platform-select {
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 120px;
+        }
+        .url-input {
+            flex: 2;
+            min-width: 220px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 2rem;
+            padding: 0.6rem 1.2rem;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+        }
+        .url-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px #38bdf833;
+        }
+        .remove-btn {
+            background: #4b1e1e;
+            border: 1px solid #7f1d1d;
+            color: #fecaca;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .remove-btn:hover {
+            background: #7f1d1d;
+        }
+        .btn-primary {
+            background: #2563eb;
+            border: none;
+            border-radius: 2.5rem;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 10px 20px -8px #2563ebcc;
+            transition: 0.1s;
+        }
+        .btn-primary:hover {
+            background: #3b82f6;
+            transform: scale(1.02);
+        }
+        .btn-secondary {
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 2rem;
+            padding: 0.6rem 1.5rem;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        .generated-box {
+            margin-top: 2rem;
+            background: #0f172a;
+            border-radius: 3rem;
+            padding: 1rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border: 2px dashed #38bdf8;
+        }
+        .generated-link {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #a5f3fc;
+            text-decoration: none;
+            word-break: break-all;
+            cursor: pointer;
+        }
+        .generated-link:hover {
+            text-decoration: underline;
+            color: #7dd3fc;
+        }
+        .copy-btn {
+            background: #1e293b;
+            border: 1px solid #38bdf8;
+            border-radius: 2.5rem;
+            padding: 0.5rem 1.5rem;
+            color: #b0e0ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: #2d3b52;
+        }
+
+        /* step result (unlock) */
+        .step-result-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .step-result-item {
+            background: #1e293b;
+            border-radius: 3rem;
+            padding: 1rem 1.8rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            border-left: 8px solid #475569;
+        }
+        .step-result-item.completed {
+            border-left-color: #22c55e;
+            opacity: 0.9;
+        }
+        .step-icon {
+            font-size: 2rem;
+            width: 3rem;
+            text-align: center;
+            color: #94a3b8;
+        }
+        .step-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #e2e8f0;
+            min-width: 90px;
+        }
+        .confirm-btn {
+            background: #2d3b52;
+            border: 1px solid #3b82f6;
+            border-radius: 2.5rem;
+            padding: 0.5rem 1.5rem;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #64748b;
+        }
+        .final-link-container {
+            margin-top: 2.5rem;
+            background: #0f172a;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid #38bdf8;
+        }
+        .final-link {
+            background: #1e293b;
+            padding: 1rem 2rem;
+            border-radius: 4rem;
+            display: inline-block;
+        }
+        .final-link a {
+            color: #a5f3fc;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .flex-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .mt-3 { margin-top: 1.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .text-muted { color: #94a3b8; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<div class="glass-card">
+
+    <!-- PANEL KONFIGURASI -->
+    <div id="configPanel">
+        <h1><i class="fas fa-gear" style="color:#38bdf8;"></i> Konfigurasi Shortcut</h1>
+        <div id="shortcutList" class="shortcut-list">
+            <!-- akan diisi javascript: satu baris default youtube -->
+        </div>
+        <div class="flex-row" style="justify-content: space-between; margin-top: 0.5rem;">
+            <button class="btn-secondary" id="addShortcutBtn"><i class="fas fa-plus-circle"></i> Tambah shortcut</button>
+        </div>
+
+        <h2 style="margin-top: 2rem;"><i class="fas fa-link"></i> Tautan Utama (tujuan akhir)</h2>
+        <input type="text" id="mainUrlInput" class="url-input" style="width:100%;" placeholder="https://... (file / link utama)" value="https://example.com/mod.zip">
+
+        <div class="flex-row" style="justify-content: center; margin-top: 2rem;">
+            <button class="btn-primary" id="generateBtn"><i class="fas fa-magic"></i> Generate Link</button>
+        </div>
+
+        <!-- Kotak hasil generate (muncul setelah generate) -->
+        <div id="generatedLinkBox" class="generated-box hidden">
+            <span style="color:#94a3b8;"><i class="fas fa-share-alt"></i> Link publik:</span>
+            <a href="#" id="generatedLink" class="generated-link">https://unlock.demo/xxx</a>
+            <button class="copy-btn" id="copyLinkBtn"><i class="far fa-copy"></i> Copy</button>
+        </div>
+    </div>
+
+    <!-- PANEL HASIL (UNLOCK) -->
+    <div id="resultPanel" class="result-panel hidden">
+        <div class="flex-row" style="justify-content: space-between;">
+            <h1><i class="fas fa-lock-open" style="color:#4ade80;"></i> Buka kunci</h1>
+            <button class="btn-secondary" id="backToConfigBtn"><i class="fas fa-arrow-left"></i> Kembali</button>
+        </div>
+        <p class="text-muted">Klik ikon shortcut berurutan dari atas, lalu konfirmasi.</p>
+        <div id="stepsResultContainer" class="step-result-list"></div>
+        <div id="finalLinkContainer" class="final-link-container hidden">
+            <div style="margin-bottom: 0.5rem;">✅ Semua langkah selesai!</div>
+            <div class="final-link" id="finalLink"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- elemen global ----------
+        const configPanel = document.getElementById('configPanel');
+        const resultPanel = document.getElementById('resultPanel');
+        const shortcutList = document.getElementById('shortcutList');
+        const addShortcutBtn = document.getElementById('addShortcutBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const mainUrlInput = document.getElementById('mainUrlInput');
+        const generatedLinkBox = document.getElementById('generatedLinkBox');
+        const generatedLinkEl = document.getElementById('generatedLink');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const backToConfigBtn = document.getElementById('backToConfigBtn');
+        const stepsResultContainer = document.getElementById('stepsResultContainer');
+        const finalLinkContainer = document.getElementById('finalLinkContainer');
+        const finalLink = document.getElementById('finalLink');
+
+        // data generated links (simulasi database)
+        const generatedStore = {};  // key: random id, value: { steps, mainUrl }
+
+        // mapping platform ke icon FA
+        const platformIcon = {
+            'YouTube': 'fab fa-youtube',
+            'WhatsApp': 'fab fa-whatsapp',
+            'TikTok': 'fab fa-tiktok',
+            'Telegram': 'fab fa-telegram',
+            'Instagram': 'fab fa-instagram',
+            'Website': 'fas fa-globe'
+        };
+
+        // state untuk result saat ini
+        let currentSteps = [];
+        let currentMainUrl = '';
+        let stepStates = [];
+
+        // ---------- fungsi bantuan ----------
+        function randomId() {
+            return Math.random().toString(36).substring(2, 8) + Math.random().toString(36).substring(2, 8);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get('id');
+
+if (id) {
+    fetch(`/g/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            currentSteps = data.steps;
+            currentMainUrl = data.mainUrl;
+            stepStates = currentSteps.map(() => ({ linkClicked: false, completed: false }));
+            renderResultPage();
+            configPanel.classList.add('hidden');
+            resultPanel.classList.remove('hidden');
+        })
+        .catch(() => alert('Link tidak valid.'));
+}
+        }
+
+        // render icon sesuai platform
+        function setIcon(selectEl, iconSpan) {
+            const platform = selectEl.value;
+            iconSpan.className = `shortcut-icon ${platformIcon[platform] || 'fas fa-link'}`;
+        }
+
+        // membuat satu baris shortcut di config
+        function createShortcutRow(platform = 'YouTube', url = '') {
+            const row = document.createElement('div');
+            row.className = 'shortcut-row';
+
+            const iconSpan = document.createElement('i');
+            iconSpan.className = `shortcut-icon ${platformIcon[platform]}`;
+            row.appendChild(iconSpan);
+
+            const select = document.createElement('select');
+            select.className = 'platform-select';
+            ['YouTube', 'WhatsApp', 'TikTok', 'Telegram', 'Instagram', 'Website'].forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                if (p === platform) opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.addEventListener('change', () => setIcon(select, iconSpan));
+            row.appendChild(select);
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'url-input';
+            input.placeholder = 'https://...';
+            input.value = url || (platform === 'YouTube' ? 'https://youtube.com/@channel' :
+                                 platform === 'WhatsApp' ? 'https://wa.me/62812' :
+                                 platform === 'TikTok' ? 'https://tiktok.com/@user' : 'https://example.com');
+            row.appendChild(input);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Hapus';
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                row.remove();
+            });
+            row.appendChild(removeBtn);
+
+            return row;
+        }
+
+        // inisialisasi default satu baris YouTube
+        function initDefaultRows() {
+            shortcutList.innerHTML = '';
+            shortcutList.appendChild(createShortcutRow('YouTube', 'https://youtube.com/@samp_official'));
+        }
+        initDefaultRows();
+
+        // tambah shortcut
+        addShortcutBtn.addEventListener('click', () => {
+            shortcutList.appendChild(createShortcutRow('YouTube', ''));
+        });
+
+        // ---------- GENERATE LINK ----------
+        generateBtn.addEventListener('click', async () => {
+
+    const rows = shortcutList.querySelectorAll('.shortcut-row');
+    const steps = [];
+
+    for (let row of rows) {
+        const platform = row.querySelector('.platform-select').value;
+        const url = row.querySelector('.url-input').value.trim();
+        if (!url) return alert('Semua URL harus diisi.');
+        steps.push({ platform, url });
+    }
+
+    const mainUrl = mainUrlInput.value.trim();
+    if (!mainUrl) return alert('Tautan utama harus diisi.');
+
+    const res = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ steps, mainUrl })
+    });
+
+    const data = await res.json();
+    const realUrl = `${location.origin}/?id=${data.id}`;
+
+    generatedLinkEl.textContent = realUrl;
+    generatedLinkBox.classList.remove('hidden');
+});
+
+        // klik link hasil generate -> masuk ke mode unlock dengan data sesuai id
+        generatedLinkEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = generatedLinkEl.getAttribute('data-id');
+            if (!id || !generatedStore[id]) {
+                alert('Link tidak valid atau sudah kadaluarsa (refresh). Generate ulang.');
+                return;
+            }
+            const data = generatedStore[id];
+            // set current steps & mainUrl
+            currentSteps = data.steps;
+            currentMainUrl = data.mainUrl;
+            // reset stepStates
+            stepStates = currentSteps.map(() => ({ linkClicked: false, completed: false }));
+
+            // render result
+            renderResultPage();
+            configPanel.classList.add('hidden');
+            resultPanel.classList.remove('hidden');
+        });
+
+        // copy link
+        copyLinkBtn.addEventListener('click', () => {
+            const text = generatedLinkEl.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Link disalin!');
+            }).catch(() => {
+                alert('Gagal menyalin, salin manual.');
+            });
+        });
+
+        // kembali ke config
+        backToConfigBtn.addEventListener('click', () => {
+            resultPanel.classList.add('hidden');
+            configPanel.classList.remove('hidden');
+        });
+
+        // ---------- RENDER HALAMAN UNLOCK (hanya ikon & nama) ----------
+        function renderResultPage() {
+            stepsResultContainer.innerHTML = '';
+            finalLinkContainer.classList.add('hidden');
+            finalLink.innerHTML = '';
+
+            currentSteps.forEach((step, index) => {
+                const item = document.createElement('div');
+                item.className = 'step-result-item';
+                if (stepStates[index].completed) item.classList.add('completed');
+                item.dataset.index = index;
+
+                // icon
+                const icon = document.createElement('i');
+                icon.className = `step-icon ${platformIcon[step.platform] || 'fas fa-link'}`;
+                item.appendChild(icon);
+
+                // nama platform
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'step-name';
+                nameSpan.textContent = step.platform;
+                item.appendChild(nameSpan);
+
+                // tombol konfirmasi
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'confirm-btn';
+                confirmBtn.textContent = '✔️ Konfirmasi';
+                confirmBtn.disabled = !stepStates[index].linkClicked;
+                if (stepStates[index].completed) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = '✅ Selesai';
+                }
+
+                // event klik pada icon (sebagai link) -> buka URL
+                icon.addEventListener('click', (e) => {
+                    // cek apakah langkah aktif (previous completed)
+                    if (index > 0 && !stepStates[index-1].completed) {
+                        alert('Selesaikan langkah sebelumnya dulu.');
+                        return;
+                    }
+                    // tandai link sudah diklik, enable tombol konfirmasi
+                    stepStates[index].linkClicked = true;
+                    confirmBtn.disabled = false;
+                    // buka url di tab baru
+                    window.open(step.url, '_blank');
+                });
+
+                // event tombol konfirmasi
+                confirmBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (!stepStates[index].linkClicked) {
+                        alert('Klik ikon/link terlebih dahulu.');
+                        return;
+                    }
+                    stepStates[index].completed = true;
+                    item.classList.add('completed');
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = '✅ Selesai';
+
+                    // aktifkan langkah berikutnya (secara visual tidak ada disabled, tapi logika cek di event icon)
+                    // cek apakah semua selesai
+                    const allCompleted = stepStates.every(s => s.completed);
+                    if (allCompleted) {
+                        finalLink.innerHTML = `<a href="${currentMainUrl}" target="_blank">🔗 ${currentMainUrl}</a>`;
+                        finalLinkContainer.classList.remove('hidden');
+                    }
+                });
+
+                item.appendChild(confirmBtn);
+                stepsResultContainer.appendChild(item);
+            });
+        }
+
+        // supaya jika config diubah, generated box tetap ada, tidak masalah.
+    })();
+</script>
+</body>
+</html>
